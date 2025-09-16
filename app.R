@@ -1,30 +1,43 @@
 library(shiny)
 
+generate_story <- function(noun, verb, adjective, adverb) {
+  cat("noun: ", noun, "\n")
+  cat("verb: ", verb, "\n")
+  cat("adjective: ", adjective, "\n")
+  cat("adverb: ", adverb, "\n")
+
+  glue::glue(
+    "
+    Once upon a time, there was a {adjective} {noun} who loved to
+    {verb} {adverb}. It was the funniest thing ever!
+  "
+  )
+}
+
 ui <- fluidPage(
-  titlePanel("Mad Libs"),
+  titlePanel("Mad Libs Game"),
   sidebarLayout(
     sidebarPanel(
-      textInput("noun", "Noun:"),
-      textInput("verb", "Verb:"),
-      textInput("adjective", "Adjective:"),
-      actionButton("go", "Create Story")
+      textInput("noun1", "Enter a noun:", ""),
+      textInput("verb", "Enter a verb:", ""),
+      textInput("adjective", "Enter an adjective:", ""),
+      textInput("adverb", "Enter an adverb:", ""),
+      actionButton("submit", "Create Story")
     ),
     mainPanel(
+      h3("Your Mad Libs Story:"),
       textOutput("story")
     )
   )
 )
 
 server <- function(input, output) {
-  story <- eventReactive(input$go, {
-    paste0(
-      "Once upon a time, there was a ", input$adjective, " ", input$noun,
-      " who loved to ", input$verb, " all day long."
-    )
+  story <- eventReactive(input$submit, {
+    generate_story(input$noun1, input$verb, input$adjective, input$adverb)
   })
   output$story <- renderText({
     story()
   })
 }
 
-shinyApp(ui, server)
+shinyApp(ui = ui, server = server)
